@@ -5,7 +5,7 @@ pulled from https://sbcode.net/threejs/add-initial-scripts/
 ```
 npm install
 ```
-2.Run
+2. Run
 ```
 npm run dev
 ```
