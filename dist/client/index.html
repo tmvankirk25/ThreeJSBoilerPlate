@@ -9,10 +9,35 @@
                 overflow: hidden;
                 margin: 0px;
             }
+            #overlay {
+            width: 50%;
+            height: 20%;
+            position: fixed;
+            bottom: 20px;
+            left: 30px;
+            /* background-color: #00000009; */
+        }
+        .button{
+            background-color: transparent;
+            color: white;
+            position: fixed;
+            bottom:40px;
+            left:40px;
+            border-style: solid;
+            border-color: white;
+            padding: 5px 10px;
+        }
         </style>
     </head>
 
     <body>
+        <audio  autoplay loop>
+        <source src="./dunes-7115.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+        <div id="overlay">
+            <button class="button" id="reset">Reset</button>
+        </div>
         <script type="module" src="bundle.js"></script>
     </body>
 </html>

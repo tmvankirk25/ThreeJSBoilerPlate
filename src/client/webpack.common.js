@@ -6,6 +6,8 @@ module.exports = {
         rules: [
             {
                 exclude: /node_modules/,
+                test: /\.mp3|.wav$/,
+                loader: 'file-loader'
             },
         ],
     },
