@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import dink from "../../resources/wav/dink.wav"
+import dunes from "../../resources/wav/dunes-7115.mp3"
 // import { EffectComposer } from '/postprocessing/EffectComposer.js';
 // import { RenderPass } from '/postprocessing/RenderPass.js';
 // import { ShaderPass } from '/postprocessing/ShaderPass.js';
@@ -19,6 +20,19 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 scene.add(camera);
+
+const backgroundTrack= new Audio()
+backgroundTrack.src=dunes
+backgroundTrack.loop= true
+console.log(backgroundTrack)
+
+backgroundTrack.addEventListener("canplaythrough", () => {
+    backgroundTrack.play().catch(e => {
+       window.addEventListener('click', () => {
+          backgroundTrack.play()
+       })
+    })
+ });
 
 console.log("hjhjk")
 const audio = new Audio();
