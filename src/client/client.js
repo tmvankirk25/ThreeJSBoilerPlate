@@ -16,18 +16,68 @@ import whooshBell from "../../resources/wav/composedWooshBell.wav"
 // import { UnrealBloomPass } from '/postprocessing/UnrealBloomPass.js';
 
 // Import the necessary three.js modules
+
+window.addEventListener("load",function(){
+  document.getElementById("wrapper").style.opacity=0;
+  setTimeout(() => document.getElementById("wrapper").remove(), 1000);
+  document.getElementById("prompt").style.opacity=1;
+  
+});
+
+
+document.getElementById('sound').addEventListener('click',soundFunction)
+document.getElementById('mute').addEventListener('click',soundFunction)
 document.addEventListener( 'click', onClick );
 document.getElementById("reset").addEventListener("click",reset)
+document.getElementById('brightness').addEventListener('click',adjustBrightness)
+
+let backgroundTrack= new Audio()
+backgroundTrack.src=dunes
+backgroundTrack.loop= true
+console.log(backgroundTrack)
+
+let track=.40
+function adjustBrightness(){
+  ambientLight.intensity+=.01
+  track+=.20
+  console.log(ambientLight.intensity)
+  console.log(track)
+  document.getElementById('brightness').style.opacity=track
+  if(ambientLight.intensity>.05){
+    ambientLight.intensity=.01
+    document.getElementById('brightness').style.opacity=.25
+    track=.20
+  }
+}
+
+function soundFunction(){
+  if(backgroundTrack.muted==true){
+    backgroundTrack.muted=false
+    audio.muted=false
+    successAudio.muted=false
+    document.getElementById('sound').style.visibility='visible'
+    document.getElementById('mute').style.visibility='hidden'
+  }
+  else{
+    backgroundTrack.muted=true
+    audio.muted=true
+    successAudio.muted=true
+    document.getElementById('sound').style.visibility='hidden'
+    document.getElementById('mute').style.visibility='visible'
+  }
+  
+}
+
 const mouse = new THREE.Vector2(), raycaster = new THREE.Raycaster();
 // Set up the scene
 const scene = new THREE.Scene();
-// scene.background = new THREE.Color( "#171717" );
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 4000);
 const renderer = new THREE.WebGLRenderer( { antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ReinhardToneMapping;
 document.body.appendChild(renderer.domElement);
 scene.add(camera);
+
 
 
 const ENTIRE_SCENE = 0, BLOOM_SCENE = 1;
@@ -73,10 +123,6 @@ finalComposer.addPass( finalPass );
 
 
 
-const backgroundTrack= new Audio()
-backgroundTrack.src=dunes
-backgroundTrack.loop= true
-console.log(backgroundTrack)
 
 backgroundTrack.addEventListener("canplaythrough", () => {
     backgroundTrack.play().catch(e => {
@@ -94,14 +140,14 @@ console.log(dink)
 const successAudio = new Audio()
 successAudio.src=whooshBell
 
+camera.position.z=-600
 
 // Set up the controls
 let controls = new OrbitControls( camera,  renderer.domElement  );
-          controls.minZoom=.5
-          controls.maxZoom=1.5
           controls.minDistance = 120;
           controls.maxDistance = 600;
           controls.update()
+
 // Set up the spheres
 //const sphereGeometry = new THREE.SphereGeometry(getRandomArbitrary(1, 10), 32, 32);
 const darkMaterial = new THREE.MeshBasicMaterial( { color: 'black' } );
@@ -122,6 +168,11 @@ for (let i = 0; i < 120; i++) {
   sphere.position.set(getRandomArbitrary(-400, 400), getRandomArbitrary(-400, 400), getRandomArbitrary(-400, 400));
   //light.position.set(sphere.position.x,sphere.position.y,sphere.position.z );
   sphere.velocity = new THREE.Vector3(Math.random(), Math.random(), Math.random()).multiplyScalar(1.8);
+  var randFactor=Math.random()
+  if(randFactor<.5){
+    sphere.velocity.x*=-1
+    sphere.velocity.y*=-1
+  }
   sphere.radius=radius
   sphere.bloom=false
   //sphere.attach(light)
@@ -133,7 +184,7 @@ let index=getRandomArbitrary(0,spheres.length)
 // spheres[index].children[0].intensity=5
 // spheres[index].material.emissiveIntensity=5
 
-let ambientLight= new THREE.AmbientLight ( 0xffffff, .01)
+let ambientLight= new THREE.AmbientLight ( 0xffffff, .02)
 scene.add(ambientLight)
 // let dirLight= new THREE.DirectionalLight( 0xffffff, 1 )
 // let dirLight2= new THREE.DirectionalLight( 0xffffff, 1 )
@@ -152,6 +203,7 @@ function reset(){
     sphere.material.emissiveIntensity=0
   }
 }
+let promptBool=false
 function onClick( event ) {
   event.preventDefault();
   console.log("click")
@@ -170,12 +222,18 @@ function onClick( event ) {
 
       const object = intersections[ 0 ].object;
       console.log(object)
+      if (promptBool==false){
+        promptBool=true
+        document.getElementById("prompt").style.display="none"
+      }
       if(object.bloom==true){
         object.layers.disable( 1 )
         object.bloom=false
         object.material.emissiveIntensity=0
       }
       else{
+        audio.currentTime=0
+        audio.play()
         object.layers.enable( 1 )
         object.material.emissiveIntensity=.1
         object.bloom=true
@@ -193,11 +251,11 @@ function animate() {
     sphere.velocity.clampLength(.5,10000)
     sphere.position.add(sphere.velocity);
 
-    if (sphere.position.x < -400 || sphere.position.x > 400) {
+    if (sphere.position.x < -window.innerWidth/2+sphere.radius || sphere.position.x > window.innerWidth/2-sphere.radius) {
         // Reflect the velocity off the x-boundary
         sphere.velocity.x *= -1;
       }
-      if (sphere.position.y < -400 || sphere.position.y > 400) {
+      if (sphere.position.y < -window.innerHeight/2 || sphere.position.y > window.innerHeight/2) {
         // Reflect the velocity off the y-boundary
         sphere.velocity.y *= -1;
       }
